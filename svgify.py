@@ -63,9 +63,10 @@ if __name__ == "__main__":
     if not os.path.exists(f"./svg_fonts"):
         os.mkdir(f"./svg_fonts")
 
-    for file in os.listdir("./json_fonts"):
+    # use test directories (temporary)
+    for file in os.listdir("./test_json_fonts"):
         if file.endswith('.json'):
-            with open(f"./json_fonts/{file}", 'r') as f:
+            with open(f"./test_json_fonts/{file}", 'r') as f:
                 font_data: dict= json.load(f)
 
             font_name: str = font_data['name']
