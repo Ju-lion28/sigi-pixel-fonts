@@ -1,0 +1,5 @@
+= Sigi to Font File
+:author: Julian
+:toc: auto
+
+Converting JSON files from https://github.com/rsms/sigi-pixel-font[rsms/sigi-pixel-font] to actual font files such as `.ttf` and `.otf`. But for now, a bunch of `.svg`s.
