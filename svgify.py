@@ -10,26 +10,42 @@ def create_svg(glyph: dict, height: int) -> ET.ElementTree:
     svg = ET.Element("svg", width=str(glyph_width), height=str(height), 
                      xmlns="http://www.w3.org/2000/svg", version="1.1")
 
-    for x, y in glyph_coords:
-        neighbours: dict[tuple[int,int],int] = {
-            ( 1, 0): 0,
-            ( 0, 1): 0,
-            (-1, 0): 0,
-            ( 0,-1): 0
-        }
-        for dx, dy in neighbours.keys():
-            nx, ny = x + dx, y + dy
-            while (0<=nx < glyph_width) and (0<=ny < height) and ([nx,ny] in glyph_coords):
-                neighbours[(dx,dy)] += 1
-                nx, ny = nx + dx, ny + dy
-                
-        print(f"{x,y} -> {neighbours}")
+    visited = set()
+    paths = []
 
-    # for coord in glyph_coords:
-    #     x: int = coord[0]
-    #     y: int = coord[1]
-    #     rect = ET.Element("rect", x=str(x), y=str(y), width="1", height="1", fill="black")
-    #     svg.append(rect)
+    for x, y in glyph_coords:
+        if (x, y) in visited:
+            continue
+
+        # Start a new path
+        path_data = []
+        current_path = [(x, y)]
+        visited.add((x, y))
+
+        # Horizontal continuation
+        while (x + 1, y) in glyph_coords and (x + 1, y) not in visited:
+            x += 1
+            current_path.append((x, y))
+            visited.add((x, y))
+
+        # Close the horizontal path
+        if len(current_path) > 1:
+            path_data.append(f"M{current_path[0][0]} {current_path[0][1]}")
+            path_data.append(f"H{current_path[-1][0] + 1}")
+
+        # Add vertical continuation if needed
+        for (x, y) in current_path:
+            if (x, y + 1) in glyph_coords and (x, y + 1) not in visited:
+                path_data.append(f"V{y + 1}")
+                visited.add((x, y + 1))
+
+        if path_data:
+            paths.append(' '.join(path_data))
+    
+    # Create path element and add to the SVG
+    if paths:
+        path_element = ET.Element("path", d=' '.join(paths), fill="black")
+        svg.append(path_element)
 
     tree = ET.ElementTree(svg)
     return tree
